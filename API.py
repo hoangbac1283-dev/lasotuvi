@@ -6,14 +6,12 @@ import os
 from lasotuvi.App import lapDiaBan
 from lasotuvi.DiaBan import diaBan
 
-
 app = FastAPI()
 
 # =========================
-# Gemini Client
+# GEMINI CLIENT
 # =========================
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
-
+client = genai.Client(api_key="AIzaSyCKnQZdOy7r8uinTeTyoZHfHZdIXD11q2Q")
 
 # =========================
 # MODEL INPUT
@@ -26,7 +24,6 @@ class BirthInput(BaseModel):
     gender: int
     solar: bool
     timezone: int = 7
-
 
 # =========================
 # GENERATE CHART
@@ -49,14 +46,12 @@ def generate_chart(data: BirthInput):
 
     for i in range(1, 13):
         cung = db.thapNhiCung[i]
-
         result[f"cung_{i}"] = {
             "ten": cung.cungTen,
             "sao": cung.cungSao
         }
 
     return result
-
 
 # =========================
 # CHAT WITH GEMINI
@@ -68,22 +63,23 @@ async def chat(request: Request, body: dict):
     chart_data = body.get("chart_data")
 
     prompt = f"""
-    Bạn là chuyên gia tử vi chuyên nghiệp.
-    Đây là dữ liệu lá số của người dùng:
-    {chart_data}
+Bạn là chuyên gia tử vi chuyên nghiệp.
 
-    Câu hỏi:
-    {message}
+Đây là dữ liệu lá số:
+{chart_data}
 
-    Hãy trả lời chi tiết, dễ hiểu, chuyên sâu nhưng không quá hàn lâm.
-    """
+Câu hỏi:
+{message}
+
+Hãy trả lời chi tiết, dễ hiểu, chuyên sâu nhưng không quá hàn lâm.
+"""
 
     response = client.models.generate_content(
-    model="gemini-2.0-flash",
+        model="gemini-2.5-flash",
         contents=prompt,
         config={
-        "max_output_tokens": 800
-
+            "max_output_tokens": 800
+        }
     )
 
     return {"response": response.text}
