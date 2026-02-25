@@ -11,7 +11,7 @@ app = FastAPI()
 # =========================
 # GEMINI CLIENT
 # =========================
-client = genai.Client(api_key="AIzaSyCKnQZdOy7r8uinTeTyoZHfHZdIXD11q2Q")
+client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
 # =========================
 # MODEL INPUT
