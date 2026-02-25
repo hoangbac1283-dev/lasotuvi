@@ -81,6 +81,9 @@ async def chat(request: Request, body: dict):
     response = client.models.generate_content(
     model="gemini-2.0-flash",
         contents=prompt,
+        config={
+        "max_output_tokens": 800
+
     )
 
     return {"response": response.text}
