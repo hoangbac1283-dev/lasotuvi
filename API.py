@@ -1,12 +1,23 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from pydantic import BaseModel
+from google import genai
+import os
 
 from lasotuvi.App import lapDiaBan
 from lasotuvi.DiaBan import diaBan
 
+
 app = FastAPI()
 
+# =========================
+# Gemini Client
+# =========================
+client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
+
+# =========================
+# MODEL INPUT
+# =========================
 class BirthInput(BaseModel):
     day: int
     month: int
@@ -17,10 +28,12 @@ class BirthInput(BaseModel):
     timezone: int = 7
 
 
+# =========================
+# GENERATE CHART
+# =========================
 @app.post("/generate-chart")
 def generate_chart(data: BirthInput):
 
-    # Tạo địa bàn
     db = lapDiaBan(
         diaBan,
         data.day,
@@ -34,7 +47,6 @@ def generate_chart(data: BirthInput):
 
     result = {}
 
-    # Lặp 12 cung (bỏ index 0 vì list tạo từ 0–12)
     for i in range(1, 13):
         cung = db.thapNhiCung[i]
 
@@ -44,25 +56,31 @@ def generate_chart(data: BirthInput):
         }
 
     return result
-import google.generativeai as genai
-import os
-from fastapi import Request
 
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-model = genai.GenerativeModel("gemini-1.5-pro")
 
+# =========================
+# CHAT WITH GEMINI
+# =========================
 @app.post("/chat")
 async def chat(request: Request, body: dict):
+
     message = body.get("message")
     chart_data = body.get("chart_data")
 
     prompt = f"""
-    Bạn là chuyên gia tử vi.
-    Đây là dữ liệu lá số: {chart_data}
-    Câu hỏi của người dùng: {message}
-    Hãy trả lời chi tiết nhưng dễ hiểu.
+    Bạn là chuyên gia tử vi chuyên nghiệp.
+    Đây là dữ liệu lá số của người dùng:
+    {chart_data}
+
+    Câu hỏi:
+    {message}
+
+    Hãy trả lời chi tiết, dễ hiểu, chuyên sâu nhưng không quá hàn lâm.
     """
 
-    response = model.generate_content(prompt)
+    response = client.models.generate_content(
+        model="gemini-1.5-flash",
+        contents=prompt,
+    )
 
     return {"response": response.text}
