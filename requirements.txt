@@ -1,4 +1,4 @@
 fastapi
 uvicorn
 ephem
-google-generativeai
+google-genai
