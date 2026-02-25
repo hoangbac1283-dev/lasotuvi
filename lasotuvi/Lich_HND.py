@@ -46,7 +46,7 @@ def jdToDate(jd):
 def NewMoon(k):
     '''def NewMoon(k): Compute the time of the k-th new moon after
     the new moon of 1/1/1900 13:52 UCT (measured as the number of
-    days since 1/1/4713 BC noon UCT, e.g., 2451545.125 is 1/1/2000 15:00 UTC.
+    days since 1/1/4713 BC noon UCT, e.g., 2451545.125 == 1/1/2000 15:00 UTC.
     Returns a floating number, e.g., 2415079.9758617813 for k=2 or
     2414961.935157746 for k=-2.'''
     # Time in Julian centuries from 1900 January 0.5
